@@ -15,15 +15,45 @@
  */
 package com.travelsky.mlf4j.log;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.Serializable;
 
 /**
  * @author zollty
  * @since 2014-6-4
  */
-public class LoggerManager {
-    
-    public static final Map<String, LoggerInfo> cacheLoggerMap = new HashMap<String, LoggerInfo>();
+public class LoggerInfo implements Serializable {
 
+    private static final long serialVersionUID = 14463265368828542L;
+
+    private Logger logger;
+
+    private String level;
+    
+    public LoggerInfo(Logger logger) {
+        super();
+        this.logger = logger;
+    }
+
+    public LoggerInfo(Logger logger, String level) {
+        super();
+        this.logger = logger;
+        this.level = level;
+    }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+    
 }

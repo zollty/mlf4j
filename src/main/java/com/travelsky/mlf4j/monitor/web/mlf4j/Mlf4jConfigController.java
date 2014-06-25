@@ -68,5 +68,31 @@ public class Mlf4jConfigController {
         }
         return new TextView(ret);
     }
+    
+    @RequestMapping("/mlf4j/show-all-loggers")
+    public View showAllLoggers() throws MlfI18nException {
+        return new TextView(WebTools.doService(new Service2() {
+            @Override
+            public String service() throws MlfI18nException {
+                return mlf4jConfigService.showAllLoggers();
+            }
+        }));
+    }
+    
+    
+    @RequestMapping("/mlf4j/remove-logger-from-cache")
+    public View showAllLoggers(@HttpParam("loggerName") final String loggerName) throws MlfI18nException {
+        String ret;
+        if (MvcUtils.StringUtil.isNotBlank(loggerName)) {
+            if(mlf4jConfigService.removeLoggerFromCache(loggerName)){
+                ret = Const.OK;   
+            } else {
+                ret = Const.ERROR + "map remove return false!";
+            }
+        } else {
+            ret = Const.ERROR + "loggerName is blank!";
+        }
+        return new TextView(ret);
+    }
 
 }

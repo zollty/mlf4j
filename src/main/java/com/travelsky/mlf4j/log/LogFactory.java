@@ -60,7 +60,15 @@ public class LogFactory {
         if (null == logCreator) { // 默认初始化
             refreshZolltyLogConfig("mlf4j-config.properties");
         }
-        return new LoggerWrapper(logCreator.newInstance(name));
+        synchronized (LoggerManager.cacheLoggerMap) {
+            LoggerInfo loggerInfo = LoggerManager.cacheLoggerMap.get(name);
+            if(loggerInfo!=null) {
+                return loggerInfo.getLogger();
+            }
+            LoggerWrapper logger = new LoggerWrapper(logCreator.newInstance(name));
+            LoggerManager.cacheLoggerMap.put(name, new LoggerInfo(logger));
+            return logger;
+        }
     }
 	
     /**

@@ -28,4 +28,8 @@ public interface IMlf4jConfigService {
     
     void refreshMlf4jConfig(String configStr) throws MlfI18nException;
     
+    String showAllLoggers() throws MlfI18nException;
+    
+    boolean removeLoggerFromCache(String loggerName);
+    
 }

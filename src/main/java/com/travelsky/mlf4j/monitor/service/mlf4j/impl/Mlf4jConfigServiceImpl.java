@@ -17,6 +17,8 @@ package com.travelsky.mlf4j.monitor.service.mlf4j.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -25,9 +27,12 @@ import org.zollty.framework.util.MvcUtils;
 import org.zollty.util.NestedRuntimeException;
 
 import com.travelsky.mlf4j.base.exception.MlfI18nException;
+import com.travelsky.mlf4j.base.json.SimpleJSON;
 import com.travelsky.mlf4j.base.util.PropertiesTools;
 import com.travelsky.mlf4j.log.LogFactory;
 import com.travelsky.mlf4j.log.LogUtils;
+import com.travelsky.mlf4j.log.LoggerInfo;
+import com.travelsky.mlf4j.log.LoggerManager;
 import com.travelsky.mlf4j.monitor.service.mlf4j.IMlf4jConfigService;
 
 /**
@@ -54,6 +59,22 @@ public class Mlf4jConfigServiceImpl implements IMlf4jConfigService {
     public String getMlf4jConfig() throws MlfI18nException {
         
         return PropertiesTools.getResoureFileContent("mlf4j-config.properties");
+    }
+
+    @Override
+    public String showAllLoggers() throws MlfI18nException {
+        synchronized (LoggerManager.cacheLoggerMap) {
+            List<SimpleJSON> loggerList = new ArrayList<SimpleJSON>();
+            for(Map.Entry<String, LoggerInfo> en: LoggerManager.cacheLoggerMap.entrySet()){
+                loggerList.add(SimpleJSON.getInstance().addItem(en.getKey(), en.getValue().getLevel()));
+            }
+            return SimpleJSON.toSimpleJSONArray(loggerList).toString();
+        }
+    }
+
+    @Override
+    public boolean removeLoggerFromCache(String loggerName) {
+        return LoggerManager.cacheLoggerMap.remove(loggerName)==null?false:true;
     }
     
 
