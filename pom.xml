@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
    Mlf4j (Monitoring Logging Facade for Java) 
-   为监控而生的通用日志工具库
+   ---为监控而生的通用日志工具库
    
    Licensed under the Apache License, Version 2.0 (the "License").
    you may not use this file except in compliance with the License.
@@ -27,12 +27,6 @@
 	<url>https://github.com/TravelskyTech/mlf4j</url>
 	<description>A simple, generic and flexible logging library for Java.</description>
 
-	
-	<!-- CONST -->
-	<properties>
-		<java-version>1.6</java-version>
-	</properties>
-	
 	<dependencies>
 		
 		<dependency>
