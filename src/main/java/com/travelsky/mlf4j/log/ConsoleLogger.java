@@ -22,14 +22,14 @@ package com.travelsky.mlf4j.log;
 public class ConsoleLogger extends ConsoleAppender {
 
     private static final long serialVersionUID = -1792281127159744836L;
-    private String className;
+    private final String className;
 
     public ConsoleLogger(String className) {
         this.className = className;
     }
 
     public ConsoleLogger() {
-        // doService(0);
+        this.className = null;
     }
 
     @Override
@@ -214,6 +214,11 @@ public class ConsoleLogger extends ConsoleAppender {
     @Override
     public boolean isInfoEnabled() {
         return isEffectiveLevel(Level.INFO);
+    }
+
+    @Override
+    public String getName() {
+        return className;
     }
 
 }

@@ -32,6 +32,6 @@ if (typeof WebPathUtils !== 'object') {
     		    g_RootPath = curWwwPath.substr(0, curWwwPath.length-pathName.length+pathName.substr(1).indexOf('/')+2);
     	    }
     	    return g_RootPath;
-    	}
+    	};
     }
 }());

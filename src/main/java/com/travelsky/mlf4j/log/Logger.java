@@ -42,4 +42,10 @@ public interface Logger extends BasicLog {
      * @param msgParams 输出信息中占位符'{}'的值
      */
     void log(String callerFQCN, Level level, Throwable t, Object msg, Object... msgParams);
+    
+    /**
+     * 获取logger的名称
+     * @return logger name
+     */
+    String getName();
 }

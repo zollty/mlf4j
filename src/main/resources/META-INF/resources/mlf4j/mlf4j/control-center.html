@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>日志监控中心(Mlf4j)</title>
+<link href="../css/main.css" rel="stylesheet"  type="text/css" />
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/json2.js"></script>
+<script type="text/javascript" src="../js/WebPathUtils.js"></script>
+<script type="text/javascript" src="../js/waitingbox.js"></script>
+</head>
+<body>
+<br />
+<br />
+
+  <table id="loggerExeInfo" style="margin: 5px auto; width: 600px;">
+    <tr id="lei_title">
+      <th>Logger名称</th>
+      <th>TRACE</th>
+      <th>DEBUG</th>
+      <th>INFO</th>
+      <th>WARN</th>
+      <th>ERROR</th>
+    </tr>
+  </table>
+
+  <div id="cfdetail_div"></div>
+<script type="text/javascript">
+$(function() {
+	  // 查询日志配置的详细内容
+	  var uri = "mlf4j/showLoggerExeInfo";
+	  var url = WebPathUtils.getRootPath() + uri;
+	  showWBox(); // 弹出提示： 正在处理，请稍后....
+	  $.get(url, function(data) {
+	  	hideWBox(); // 关闭提示
+	  	assembleTable(jQuery.parseJSON(data));
+	  });
+});
+
+function assembleTable(data){
+	var trStr = '';
+	for(var i=0;i<data.length;i++) {
+		trStr += '<tr>';
+		trStr += '<td>'+data[i].name+'</td>';
+		trStr += '<td>'+data[i].trace+'</td>';
+		trStr += '<td>'+data[i].debug+'</td>';
+		trStr += '<td>'+data[i].info+'</td>';
+		trStr += '<td>'+data[i].warn+'</td>';
+		trStr += '<td>'+data[i].error+'</td>';
+		trStr += '</tr>';
+	}
+	
+	$("#lei_title").after(trStr);
+}
+
+
+$(function() {
+	// 修改RootLogger的输出级别
+	$("#modifyRootLogLev_btn").click(function() {
+		var uri = "mlf4j/log4j/modify-rootLogger-level";
+		var url = WebPathUtils.getRootPath() + uri;
+		var level = $("#rootLogger_level").val();
+		if(level==''){
+			alert("日志级别(Logger Level)不能为空");
+			return;
+		}
+		showWBox(); // 弹出提示： 正在处理，请稍后....
+		$.post(url, {
+			"level": level
+		}, function(data) {
+			hideWBox(); // 关闭提示
+			if(data=='OK'){
+				alert("修改成功");
+			}
+		});
+	});
+});
+</script>
+</body>
+</html>

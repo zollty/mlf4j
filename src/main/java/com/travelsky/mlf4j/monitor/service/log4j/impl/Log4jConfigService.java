@@ -17,11 +17,11 @@ package com.travelsky.mlf4j.monitor.service.log4j.impl;
 
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -54,13 +54,26 @@ public class Log4jConfigService implements ILog4jConfigService {
     
     private static com.travelsky.mlf4j.log.Logger log = LogFactory.getLogger();
 
+    @SuppressWarnings("rawtypes")
     @Override
     public void modifyAppenderLevel(String name, String level) throws MlfI18nException {
 
-        // 当前操作是准对 Appender的
+        // 当前操作是针对 Appender的
         AppenderSkeleton app = (AppenderSkeleton) LogManager.getRootLogger().getAppender(name);
         if (app == null || !app.getName().equals(name)) {
-           return;
+            Enumeration loggers = LogManager.getLoggerRepository().getCurrentLoggers();
+            if (loggers != null) {
+                while (loggers.hasMoreElements()) {
+                    Logger lo = (Logger) loggers.nextElement();
+                    app = (AppenderSkeleton) lo.getAppender(name);
+                    if(app!=null && app.getName().equals(name)){
+                        break;
+                    }
+                }
+            }
+            if (app == null || !app.getName().equals(name)) {
+                return;
+            }
         }
         if ("OFF".equals(level)) {
             // 不允许任何级别日志输出
@@ -206,43 +219,45 @@ public class Log4jConfigService implements ILog4jConfigService {
                 .addItem("logList", SimpleJSON.toSimpleJSONArray(logList))
                 .addItem("bigCount", flag)
                 .addItem("levelCount", levelCount)
-                .addItem(
-                        "rootLogger",
+                .addItem("rootLogger",
                         SimpleJSON.getInstance().addItem("name", rootlog.getName())
                                 .addItem("level", rootlevel != null ? rootlevel.toString() : "NULL"));
 
-        List<SimpleJSON> appList = new ArrayList<SimpleJSON>();
-        Map<AppenderSkeleton, AppenderSkeleton> amap = new HashMap<AppenderSkeleton, AppenderSkeleton>();
+        Set<AppenderSkeleton> asSet = new TreeSet<AppenderSkeleton>(new Comparator<AppenderSkeleton>() {
+            // appender的名称排序
+            @Override
+            public int compare(AppenderSkeleton app1, AppenderSkeleton app2) {
+                return app1.getName().compareTo(app2.getName()); // 升序
+            }
+        });
+        // ----@Bgn 有待优化 [所有Logger遍历效率较低]
         Enumeration loggers = LogManager.getLoggerRepository().getCurrentLoggers();
         if (loggers != null) {
             while (loggers.hasMoreElements()) {
                 Logger lo = (Logger) loggers.nextElement();
                 Enumeration eapp = lo.getAllAppenders();
                 while (eapp.hasMoreElements()) {
-                    AppenderSkeleton as = (AppenderSkeleton) eapp.nextElement();
-                    amap.put(as, as);
+                    asSet.add((AppenderSkeleton) eapp.nextElement());
                 }
             }
         }
         enmu = LogManager.getRootLogger().getAllAppenders();
         if (enmu != null) {
             while (enmu.hasMoreElements()) {
-                AppenderSkeleton as = (AppenderSkeleton) enmu.nextElement();
-                amap.put(as, as);
+                asSet.add((AppenderSkeleton) enmu.nextElement());
             }
         }
-        Iterator<AppenderSkeleton> it = amap.keySet().iterator();
-        while (it.hasNext()) {
-            AppenderSkeleton app = (AppenderSkeleton) it.next();
+        // ----@End 有待优化
+        List<SimpleJSON> appList = new ArrayList<SimpleJSON>();
+        for(AppenderSkeleton app: asSet){
             appList.add(SimpleJSON.getInstance().addItem("name", app.getName())
-                    .addItem("level", app.getThreshold() != null ? app.getThreshold().toString() : "NULL"));
+                  .addItem("level", app.getThreshold() != null ? app.getThreshold().toString() : "NULL"));
         }
-
         ret.addItem("appList", SimpleJSON.toSimpleJSONArray(appList));
 
         return ret.toJsonString();
     }
-
+    
     /* (non-Javadoc)
      * @see com.travelsky.mlf4j.monitor.service.log4j.ILog4jConfigService#showConfigFileContent()
      */

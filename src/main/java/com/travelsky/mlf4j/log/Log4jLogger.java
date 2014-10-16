@@ -272,4 +272,10 @@ public class Log4jLogger implements com.travelsky.mlf4j.log.Logger, LoggerSuppor
         return getLogger().isInfoEnabled();
     }
 
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
 }

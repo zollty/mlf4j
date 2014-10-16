@@ -19,7 +19,6 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 
 /**
@@ -34,13 +33,12 @@ public class ConsoleJdk14Logger extends Jdk14Logger {
     private static final long serialVersionUID = 2836404574562238891L;
 
     public ConsoleJdk14Logger(){
+        super();
     }
     
     public ConsoleJdk14Logger(String name) {
-        this.loggerName = name;
-        this.log = LogManager.getLogManager().getLogger(name);
-        if (this.log == null) {
-            this.log = Logger.getLogger(name);
+        super(name);
+        if (LogManager.getLogManager().getLogger(name) == null) {
             Level level = getLevel();
             Handler consoleHandler = new ConsoleHandler();
             consoleHandler.setLevel(level);

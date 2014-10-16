@@ -32,4 +32,6 @@ public interface IMlf4jConfigService {
     
     boolean removeLoggerFromCache(String loggerName);
     
+    String showLoggerExeInfo();
+    
 }

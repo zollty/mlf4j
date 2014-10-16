@@ -42,9 +42,10 @@ public class Jdk14Logger implements com.travelsky.mlf4j.log.Logger, LoggerSuppor
     /**
      * The name of the logger we are wrapping.
      */
-    protected String loggerName;
+    protected final String loggerName;
     
     public Jdk14Logger(){
+        this.loggerName = null;
     }
     
     public Jdk14Logger(String name){
@@ -355,6 +356,11 @@ public class Jdk14Logger implements com.travelsky.mlf4j.log.Logger, LoggerSuppor
             record.setSourceClassName(ste.getClassName());
             record.setSourceMethodName(ste.getMethodName());
         }
+    }
+
+    @Override
+    public String getName() {
+        return loggerName;
     }
 
 

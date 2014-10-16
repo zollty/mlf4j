@@ -18,6 +18,9 @@ package com.travelsky.mlf4j.monitor.service.mlf4j.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -31,8 +34,10 @@ import com.travelsky.mlf4j.base.json.SimpleJSON;
 import com.travelsky.mlf4j.base.util.PropertiesTools;
 import com.travelsky.mlf4j.log.LogFactory;
 import com.travelsky.mlf4j.log.LogUtils;
+import com.travelsky.mlf4j.log.LoggerExeInfo;
 import com.travelsky.mlf4j.log.LoggerInfo;
 import com.travelsky.mlf4j.log.LoggerManager;
+import com.travelsky.mlf4j.log.LoggerManager.LoggerExeCountComparator;
 import com.travelsky.mlf4j.monitor.service.mlf4j.IMlf4jConfigService;
 
 /**
@@ -75,6 +80,27 @@ public class Mlf4jConfigServiceImpl implements IMlf4jConfigService {
     @Override
     public boolean removeLoggerFromCache(String loggerName) {
         return LoggerManager.cacheLoggerMap.remove(loggerName)==null?false:true;
+    }
+
+    @Override
+    public String showLoggerExeInfo() {
+        Collection<LoggerExeInfo> loges = LoggerManager.getLoggerExeMap().values();
+        LoggerExeInfo[] logArray = new LoggerExeInfo[loges.size()];
+        List<LoggerExeInfo> logList = Arrays.asList(loges.toArray(logArray));
+        Collections.sort(logList, new LoggerExeCountComparator()); // 排序
+        
+        List<SimpleJSON> loggerList = new ArrayList<SimpleJSON>();
+        for(LoggerExeInfo value: logList){
+            loggerList.add(SimpleJSON.getInstance().addItem("name", value.getName())
+                    .addItem("trace", value.getTraceCount())
+                    .addItem("debug", value.getDebugCount())
+                    .addItem("info", value.getInfoCount())
+                    .addItem("warn", value.getWarnCount())
+                    .addItem("error", value.getErrorCount())
+                    );
+        }
+        
+        return SimpleJSON.toSimpleJSONArray(loggerList).toString();
     }
     
 

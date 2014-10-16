@@ -94,5 +94,15 @@ public class Mlf4jConfigController {
         }
         return new TextView(ret);
     }
+    
+    @RequestMapping("/mlf4j/showLoggerExeInfo")
+    public View showLoggerExeInfo() throws MlfI18nException {
+        return new TextView(WebTools.doService(new Service2() {
+            @Override
+            public String service() throws MlfI18nException {
+                return mlf4jConfigService.showLoggerExeInfo();
+            }
+        }));
+    }
 
 }
