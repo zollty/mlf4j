@@ -12,23 +12,23 @@
 <body>
 <br />
 <br />
-  <table border="1" width="80%" bgcolor="#E8E8E8" cellpadding="0" >
+  <table border="1" width="70%" bgcolor="#E8E8E8" cellpadding="0" >
     <tr>
-      <td><input id="loggerName" name="loggerName" type="text" value="" size="50" />输入日志名称,如:com.travelsky</td>
+      <td width="90%"><input id="loggerName" name="loggerName" type="text" value="" size="50" />输入日志名称,如:com.travelsky</td>
       <td><input type="button" id="showcfd_btn" value="查询" /></td>
     </tr>
   </table>
 
-  <table id="rootLogger_tab" border="1" width="100%" style="margin-top: 5px" bgcolor="#E8E8E8" cellpadding="0">
+  <table id="rootLogger_tab" width="100%" border="1"  style="margin-top: 5px" bgcolor="#E8E8E8" cellpadding="0">
     <tr>
       <th>RootLoger的名称</th>
-      <th>RootLoger的级别</th>
-      <th>操作</th>
+      <th width="14%">RootLoger的级别</th>
+      <th width="8%">操作</th>
     </tr>
     <tr>
       <td id="rootLogger_name"></td>
       <td><select id="rootLogger_level" name="level">
-          <option value=""></option>
+          <option value="NULL">NULL</option>
           <option value="ALL">ALL</option>
           <option value="TRACE">TRACE</option>
           <option value="DEBUG">DEBUG</option>
@@ -41,9 +41,37 @@
       <td><input id="modifyRootLogLev_btn" type="button" value="修改" /></td>
     </tr>
   </table>
+	
+  <div id="cfdetail_div">
+  	<table id="rootLogger_tab_list" border="1" width="100%" style="margin-top: 5px" bgcolor="#E8E8E8" cellpadding="0">
+  		
+  	</table>
+  </div>
 
-  <div id="cfdetail_div"></div>
+  <table id="rootLogger_tab1" border="1" width="100%" style="margin-top: 5px" bgcolor="#E8E8E8" cellpadding="0">
+    <tr>
+      <th>Logger的名称(普通的Logger)</th>
+      <th width='14%'>Logger的级别</th>
+      <th width='8%'>操作</th>
+    </tr>
+    </table>
+
+  	<table id="rootLogger_tab1_log" border="1" width="100%" style="margin-top: 5px" bgcolor="#E8E8E8" cellpadding="0">
+    
+    </table>
+
 <script type="text/javascript">
+
+var select_str = "<option value='NULL'>NULL</option>"+
+"<option value='ALL'>ALL</option>"+
+"<option value='TRACE'>TRACE</option>"+
+"<option value='DEBUG'>DEBUG</option>"+
+"<option value='INFO'>INFO</option>"+
+"<option value='WARN'>WARN</option>"+
+"<option value='ERROR'>ERROR</option>"+
+"<option value='FATAL'>FATAL</option>"+
+"<option value='OFF'>OFF</option>";
+
 $(function() {
 	// 查询日志配置的详细内容
 	$("#showcfd_btn").click(function() {
@@ -56,7 +84,37 @@ $(function() {
 			hideWBox(); // 关闭提示
 			$("#rootLogger_name").text(data.rootLogger.name);
 			$("#rootLogger_level").val(data.rootLogger.level);
-			$("#cfdetail_div").text(JSON.stringify(data));
+			//$("#cfdetail_div").text(JSON.stringify(data));
+			//var jsonStr = JSON.stringify(data);
+			var jsonStr = data;
+			var listStr = "";
+			var logStr = "";
+			for(var i = 0;i < jsonStr.appList.length;i++){
+				var sub = jsonStr.appList[i];
+				listStr += "<tr><td>"+sub.name+"</td><td width='14%'>"+
+		          "<select id='rootLogger_level_"+i+"' name='level'>"+
+		          select_str +
+		      	  "</select>"+
+		   		  "</td><td width='8%'><input onclick='modifyAppLev(this);' type='button' value='修改' /></td></tr>";
+			} 
+			for(var i = 0;i < jsonStr.logList.length;i++){
+				var sub = jsonStr.logList[i];
+				logStr += "<tr><td>"+sub.name+"</td><td width='14%'>"+
+		          "<select id='rootLogger_level_log"+i+"' name='level'>"+
+		          select_str +
+		      	  "</select>"+
+		   		  "</td><td width='8%'><input onclick='modifyLogLev(this);' type='button' value='修改' /></td></tr>";
+			} 
+			$("#rootLogger_tab_list").html(listStr);
+			$("#rootLogger_tab1_log").html(logStr);
+			for(var i = 0;i < jsonStr.appList.length;i++){
+				var sub1 = jsonStr.appList[i];
+				$("#rootLogger_level_"+i).val(sub1.level);
+			}
+			for(var i = 0;i < jsonStr.logList.length;i++){
+				var sub1 = jsonStr.logList[i];
+				$("#rootLogger_level_log"+i).val(sub1.level);
+			}
 		});
 	});
 	// 修改RootLogger的输出级别
@@ -78,7 +136,52 @@ $(function() {
 			}
 		});
 	});
+	
 });
+//修改Appender的输出级别
+function modifyAppLev(input){
+	var name = $(input).parent().parent().find('td').eq(0).html();
+	var level = $(input).parent().parent().find('td').eq(1).find('select').eq(0).val();
+	var uri = "mlf4j/log4j/modify-appender-level";
+	var url = WebPathUtils.getRootPath() + uri;
+	if(level==''){
+		alert("日志级别(Logger Level)不能为空");
+		return;
+	}
+	showWBox(); // 弹出提示： 正在处理，请稍后....
+	$.post(url, {
+		"name":name,
+		"level": level
+	}, function(data) {
+		hideWBox(); // 关闭提示
+		if(data=='OK'){
+			$(input).parent().parent().find('td').eq(0).css({backgroundColor:"#79C20D"});
+			alert("修改成功");
+		}
+	});
+}
+//修改Logger的输出级别
+function modifyLogLev(input){
+	var name = $(input).parent().parent().find('td').eq(0).html();
+	var level = $(input).parent().parent().find('td').eq(1).find('select').eq(0).val();
+	var uri = "mlf4j/log4j/modify-logger-level";
+	var url = WebPathUtils.getRootPath() + uri;
+	if(level==''){
+		alert("日志级别(Logger Level)不能为空");
+		return;
+	}
+	showWBox(); // 弹出提示： 正在处理，请稍后....
+	$.post(url, {
+		"name":name,
+		"level": level
+	}, function(data) {
+		hideWBox(); // 关闭提示
+		if(data=='OK'){
+			$(input).parent().parent().find('td').eq(0).css({backgroundColor:"#79C20D"});
+			alert("修改成功");
+		}
+	});
+}
 </script>
 </body>
 </html>
