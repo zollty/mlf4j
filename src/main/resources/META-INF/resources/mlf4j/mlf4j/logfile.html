@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>日志监控中心(Mlf4j)</title>
+<link href="../css/main.css" rel="stylesheet"  type="text/css" />
+<style type="text/css">
+.div{
+width:80%; 
+margin:0 auto
+}
+.left{
+float:left
+}
+</style>
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/json2.js"></script>
+<script type="text/javascript" src="../js/WebPathUtils.js"></script>
+<script type="text/javascript" src="../js/waitingbox.js"></script>
+<script type="text/javascript">
+
+</script>
+</head>
+<body>
+<br />
+<br />
+
+ <table id="loggerExeInfo" style="margin: 5px auto; width: 90%;">
+    <tr id="lei_title">
+      <td width="40%">文件路径：<input style="width:70%" id="logFilePath" name="logFilePath"/></td>
+      <td width="20%">起始行：<input style="width:50%" id="lineBegin" name="lineBegin"/></td>
+      <td width="20%">结束行：<input style="width:50%" id="lineEnd" name="lineEnd"/></td>
+      <td width="20%">关键字：<input style="width:50%" id="keyWord" name="keyWord"/></td>
+      </tr>
+      <tr>
+		<td colspan="4"><div>日志级别：
+		<input type="checkbox" id="DEBUG"  name="check" value="DEBUG"/>DEBUG
+		<input type="checkbox" id="INFO"  name="check" value="INFO"/>INFO
+		<input type="checkbox" id="WARN"  name="check" value="WARN"/>WARN
+		<input type="checkbox" id="ERROR"  name="check" value="ERROR"/>ERROR
+		<div style="float:right"><input type="button" id="search" value="search" onclick="getFile();"/></div>
+	</div>
+	</td>      
+      </tr>
+  </table>
+  
+<script type="text/javascript">
+function getFile(){
+	var levelStr = "";
+	var url = WebPathUtils.getRootPath() + "mlf4j/showLogFileContent";
+	var logFilePath = $("#logFilePath").val();
+	var lineBegin = $("#lineBegin").val();
+	var lineEnd = $("#lineEnd").val();
+	var keyWord = $("#keyWord").val();
+	$("[name='check']").each(function(){
+		if($(this).attr("checked")){
+			levelStr += $(this).val()+",";
+		}
+	});
+	if(logFilePath == ''){
+		alert("文件路径不能为空");
+		return;
+	}
+	if(lineBegin == '' || lineEnd == ''){
+		alert("必须输入起始页和结束页");
+		return;
+	}else{
+		if(lineEnd - lineBegin > 500){
+			alert("不能超过500行数据");
+			return;
+		}
+	}
+	$.post(url, {
+		"logFilePath": logFilePath,
+		"lineBegin":lineBegin,
+		"lineEnd":lineEnd,
+		"keyWord":keyWord,
+		"levelStr":levelStr
+	}, function(data) {
+		if("error" == data){
+			alert("找不到指定文件，文件路径有误！");
+			return;
+		}
+		if("fail" == data){
+			alert("文件读取发生异常！");
+			return;
+		}
+		dataToTxt(data);
+	});
+}
+function dataToTxt(data) {
+	var tempwindow = window.open('','_blank','');
+	var tempStr= "<textarea style='width:100%;height:99%'>";
+	tempStr += data;
+	tempStr += "</textarea>";
+	tempwindow.document.write(tempStr);
+	tempwindow.document.close();
+}
+</script>
+</body>
+</html>
