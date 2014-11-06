@@ -26,7 +26,8 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
     private static final String SPE = "\n";
     private static final String DEFAULT_ENCODE = "ISO-8859-1";
     private String encode = "GBK";
-    RandomAccessFile raf;
+    private RandomAccessFile raf;
+    private int change = 0;
    
 
     @Override
@@ -57,15 +58,16 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
             List<String> ttempList = new ArrayList<String>();
             String tempStr = "";
             String[] levelArray = level.split(",");
-            
             int start = lineBegin - 10;
             int end = lineEnd + 10;
             if (start < 1) {
                 start = 1;
             }
             int i = 1;
+            
             //对日志文件进行按行读取，因为要显示关键字前10和后10行数据，所以要多读20条数据
             while (raf.getFilePointer() < raf.length()) {
+                change = 0;
                 if (i > end) {
                     break;
                 }
@@ -80,20 +82,19 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
                     if (MvcUtils.StringUtil.isNotBlank(keyWord)) {
                         //循环level级别
                         for (int y = 0; y < levelArray.length; y++) {
-                            //关键字不为空，level为空
+                            //关键字不为空，level存在
                             if(isLevelNeed(tempStr, levelArray[y])) {
                                 int isNull = -1;
+                                
                                 if(isKeyWordNeed(tempStr,keyWord)){
                                     content = makeContent(content,tempList,tempStr,ttempList,isNull);
                                 }
                             }
-                            //关键字不为空，level不为空
+                            //关键字不为空，level不存在
                             else {
                                 if(isKeyWordNeed(tempStr,keyWord)){
                                     int isNull = -1;
-                                    if(isLevelNeed(tempStr, levelArray[y])) {
-                                        content = makeContent(content,tempList,tempStr,ttempList,isNull);
-                                    }
+                                    content = makeContent(content,tempList,tempStr,ttempList,isNull);
                                 }
                             }
                         }
@@ -121,7 +122,12 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
                 else {
                     tempStr = readContentByLine(raf);
                 }
-                i++;
+                if(change != 0){
+                   System.out.println(111);
+                   i += change; 
+                }else{
+                   i++;  
+                }
                 raf.seek(raf.getFilePointer());
             }
         }
@@ -153,7 +159,7 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
     
     private List<String> updateTempList(List<String> tempList,String tempStr){
         tempList.add(tempStr + SPE);
-        if (tempList.size() > 11) {
+        if (tempList.size() > 10) {
             tempList.remove(0);
         }
         return tempList;
@@ -175,9 +181,11 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
     
     private String makeContent(String content,List<String> tempList,String tempStr,List<String> ttempList,int isNull) throws IOException{
         content = makeTempListToContent(content,tempList);
-        for (int j = 0; j < 11; j++) {
+        for (int j = 0; j < 10; j++) {
             tempStr = readContentByLine(raf);
-            if (tempList.size() >= 11) {
+            ++change;
+            System.out.println(change);
+            if (tempList.size() >= 10) {
                 tempList.remove(0);
             }
             if (MvcUtils.StringUtil.isBlank(tempStr)) {
@@ -186,6 +194,7 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
                         ttempList.add(tempList.get(i));
                     }
                     tempList = ttempList;  
+                    ttempList.clear();
                 }
                 isNull = j;
                 break;
