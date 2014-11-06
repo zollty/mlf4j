@@ -176,7 +176,7 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
     private String makeContent(String content,List<String> tempList,String tempStr,List<String> ttempList,int isNull) throws IOException{
         content = makeTempListToContent(content,tempList);
         for (int j = 0; j < 11; j++) {
-            tempStr = raf.readLine();
+            tempStr = readContentByLine(raf);
             if (tempList.size() >= 11) {
                 tempList.remove(0);
             }
