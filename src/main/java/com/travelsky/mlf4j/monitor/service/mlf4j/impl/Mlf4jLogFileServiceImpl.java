@@ -158,12 +158,9 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
         }
         return tempList;
     }
-    private boolean isKeyWordNeed(String tempStr, String keyWord){
-        String use = tempStr;
-        if(tempStr.length()>100){
-            use = tempStr.substring(0, 100);
-        }
-        if(use.indexOf(keyWord) != -1){
+    
+    private boolean isKeyWordNeed(final String tempStr, String keyWord){
+        if(tempStr.indexOf(keyWord) != -1){
             return true;
         }
         return false;
