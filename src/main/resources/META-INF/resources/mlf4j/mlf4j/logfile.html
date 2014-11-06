@@ -4,46 +4,53 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>日志监控中心(Mlf4j)</title>
 <link href="../css/main.css" rel="stylesheet"  type="text/css" />
-<style type="text/css">
-.div{
-width:80%; 
-margin:0 auto
-}
-.left{
-float:left
-}
-</style>
 <script type="text/javascript" src="../js/jquery.js"></script>
 <script type="text/javascript" src="../js/json2.js"></script>
 <script type="text/javascript" src="../js/WebPathUtils.js"></script>
 <script type="text/javascript" src="../js/waitingbox.js"></script>
-<script type="text/javascript">
+<style type="text/css">
+.maindiv {
+  width:980px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  line-height: 28px;
+}
+.wpdiv {
+  width: 80px;
+  text-align: right;
+  font-weight: bold;
+  display: inline-block;
+  display: -moz-inline-stack;
+  zoom: 1;
+  *display: inline;
+}
+</style>
 
-</script>
 </head>
 <body>
 <br />
 <br />
-
- <table id="loggerExeInfo" style="margin: 5px auto; width: 90%;">
-    <tr id="lei_title">
-      <td width="40%">文件路径：<input style="width:70%" id="logFilePath" name="logFilePath"/></td>
-      <td width="20%">起始行：<input style="width:50%" id="lineBegin" name="lineBegin"/></td>
-      <td width="20%">结束行：<input style="width:50%" id="lineEnd" name="lineEnd"/></td>
-      <td width="20%">关键字：<input style="width:50%" id="keyWord" name="keyWord"/></td>
-      </tr>
-      <tr>
-		<td colspan="4"><div>日志级别：
-		<input type="checkbox" id="DEBUG"  name="check" value="DEBUG"/>DEBUG
-		<input type="checkbox" id="INFO"  name="check" value="INFO"/>INFO
-		<input type="checkbox" id="WARN"  name="check" value="WARN"/>WARN
-		<input type="checkbox" id="ERROR"  name="check" value="ERROR"/>ERROR
-		<div style="float:right"><input type="button" id="search" value="search" onclick="getFile();"/></div>
-	</div>
-	</td>      
-      </tr>
-  </table>
-  
+<div class="maindiv">
+	<span class="wpdiv">文件路径：</span><input style="width:700px" id="logFilePath" name="logFilePath"/><br />
+	
+	<span class="wpdiv">关键字：</span><input style="width:405px" id="keyWord" name="keyWord"/>
+		<span class="wpdiv" style="width:60px;">起始行：</span><input style="width:80px" id="lineBegin" name="lineBegin"/>
+		<span class="wpdiv" style="width:60px;">结束行：</span><input style="width:80px" id="lineEnd" name="lineEnd"/><br />
+	
+	<span class="wpdiv">日志级别：</span>
+				<input type="checkbox" id="DEBUG"  name="check" value="DEBUG"/>DEBUG
+				<input type="checkbox" id="INFO"  name="check" value="INFO"/>INFO
+				<input type="checkbox" id="WARN"  name="check" value="WARN"/>WARN
+				<input type="checkbox" id="ERROR"  name="check" value="ERROR"/>ERROR
+		<span class="wpdiv" style="width:120px;">日志编码集：</span>
+				<input type="radio" id="GBK"  name="code" value="GBK"/>GBK
+				<input type="radio" id="UTF-8"  name="code" value="UTF-8"/>UTF-8
+				<input type="radio" id="BIG5"  name="code" value="BIG5"/>BIG5
+				<input type="radio" id="GB2312"  name="code" value="GB2312"/>GB2312<br />
+		<br/>
+		<div style="text-align: center; width: 660px;"><input type="button" id="search" value="search" onclick="getFile();"/></div>
+</div>
 <script type="text/javascript">
 function getFile(){
 	var levelStr = "";
@@ -52,9 +59,15 @@ function getFile(){
 	var lineBegin = $("#lineBegin").val();
 	var lineEnd = $("#lineEnd").val();
 	var keyWord = $("#keyWord").val();
+	var code = "";
 	$("[name='check']").each(function(){
 		if($(this).attr("checked")){
 			levelStr += $(this).val()+",";
+		}
+	});
+	$("[name='code']").each(function(){
+		if($(this).attr("checked")){
+			code += $(this).val();
 		}
 	});
 	if(logFilePath == ''){
@@ -75,7 +88,8 @@ function getFile(){
 		"lineBegin":lineBegin,
 		"lineEnd":lineEnd,
 		"keyWord":keyWord,
-		"levelStr":levelStr
+		"levelStr":levelStr,
+		"code":code
 	}, function(data) {
 		if("error" == data){
 			alert("找不到指定文件，文件路径有误！");

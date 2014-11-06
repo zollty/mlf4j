@@ -15,6 +15,9 @@ public class FileContentQueryConditionBean {
     private int lineEnd;
     private String levelStr;
     private String keyWord;
+    private String code;
+    
+    
     
     /**
      * @return the logFilePath
@@ -75,6 +78,18 @@ public class FileContentQueryConditionBean {
      */
     public void setKeyWord(String keyWord) {
         this.keyWord = keyWord;
+    }
+    /**
+     * @return the code
+     */
+    public String getCode() {
+        return code;
+    }
+    /**
+     * @param code the code to set
+     */
+    public void setCode(String code) {
+        this.code = code;
     }
     
 

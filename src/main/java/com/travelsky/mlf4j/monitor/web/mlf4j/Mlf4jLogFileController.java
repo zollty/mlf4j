@@ -23,7 +23,7 @@ public class Mlf4jLogFileController {
     
     
     @RequestMapping("/mlf4j/showLogFileContent")
-    public View getFileContent(@HttpParam("logFilePath") final String logFilePath,@HttpParam("lineBegin") final String lineBegin,
+    public View getFileContent(@HttpParam("logFilePath") final String logFilePath,@HttpParam("lineBegin") final String lineBegin,@HttpParam("code") final String code,
             @HttpParam("lineEnd") final String lineEnd,@HttpParam("levelStr") final String levelStr,@HttpParam("keyWord") final String keyWord) throws MlfI18nException {
         final FileContentQueryConditionBean queryCondition = new FileContentQueryConditionBean();
         if(MvcUtils.StringUtil.isNotBlank(logFilePath)){
@@ -40,6 +40,9 @@ public class Mlf4jLogFileController {
         }
         if(MvcUtils.StringUtil.isNotBlank(keyWord)){
             queryCondition.setKeyWord(keyWord);
+        }
+        if(MvcUtils.StringUtil.isNotBlank(code)){
+            queryCondition.setCode(code);
         }
         return new TextView(WebTools.doService(new Service2() {
             @Override

@@ -25,7 +25,7 @@ import com.travelsky.mlf4j.monitor.service.mlf4j.bean.FileContentQueryConditionB
 public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
     private static final String SPE = "\n";
     private static final String DEFAULT_ENCODE = "ISO-8859-1";
-    private static final String ENCODE = "GBK";
+    private String encode = "GBK";
     RandomAccessFile raf;
    
 
@@ -43,6 +43,9 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
             }
             if(MvcUtils.StringUtil.isNotBlank(queryCondition.getLevelStr())){
                 level = queryCondition.getLevelStr();
+            }
+            if(MvcUtils.StringUtil.isNotBlank(queryCondition.getCode())){
+                encode = queryCondition.getCode();
             }
             if(queryCondition.getLineBegin() != 0){
                 lineBegin = queryCondition.getLineBegin();
@@ -132,9 +135,9 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
         content = content.replace('[', ' ').replace(']', ' ').trim();
         return content;
     }
-    //解决raf的乱码问题，raf默认用ISO-8859-1读取，我们要将他改为用GBK
+    //解决raf的乱码问题，raf默认用ISO-8859-1读取，我们要将他改为用用户选择的编码格式我们默认用gbk
     private String readContentByLine(RandomAccessFile raf) throws IOException{
-        return new String(raf.readLine().getBytes(DEFAULT_ENCODE),ENCODE);
+        return new String(raf.readLine().getBytes(DEFAULT_ENCODE),encode);
     }
     
     private boolean isLevelNeed(String tempStr, String level){
