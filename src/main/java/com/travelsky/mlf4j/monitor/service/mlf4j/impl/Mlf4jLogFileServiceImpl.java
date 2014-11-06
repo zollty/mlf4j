@@ -132,7 +132,7 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
         content = content.replace('[', ' ').replace(']', ' ').trim();
         return content;
     }
-    
+    //解决raf的乱码问题，raf默认用ISO-8859-1读取，我们要将他改为用GBK
     private String readContentByLine(RandomAccessFile raf) throws IOException{
         return new String(raf.readLine().getBytes(DEFAULT_ENCODE),ENCODE);
     }
