@@ -84,6 +84,8 @@ function getFile(){
 			return;
 		}
 	}
+	
+	showWBox(); // 弹出提示： 正在处理，请稍后....
 	$.post(url, {
 		"logFilePath": logFilePath,
 		"lineBegin":lineBegin,
@@ -92,6 +94,7 @@ function getFile(){
 		"levelStr":levelStr,
 		"code":code
 	}, function(data) {
+		hideWBox(); // 关闭提示
 		if("error" == data){
 			alert("找不到指定文件，文件路径有误！");
 			return;
