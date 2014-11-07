@@ -109,23 +109,14 @@ zollty.get = function (filename) {
     return cache;
 };
 
+
 var ajaxGetText = function(url){
 	
-   var request;
-   var factories = [function() {
-	   return new ActiveXObject("Msxml2.XMLHTTP"); },
-   function() { 
-	   return new XMLHttpRequest(); },
-   function() { 
-	   return new ActiveXObject("Microsoft.XMLHTTP"); }];
-   var request;
-   for(var i = 0; i < factories.length; i++) {
-		try {
-			request = factories[i]();
-			if (request != null) break;
-		}
-		catch(e) { continue;}
-   }
+   var request =  window.ActiveXObject !== undefined ? 
+		   new window.ActiveXObject( "Microsoft.XMLHTTP" )
+		 :
+		// For all other browsers, use the standard XMLHttpRequest object
+		new window.XMLHttpRequest();
    
    request.open("GET", url, false);
    
