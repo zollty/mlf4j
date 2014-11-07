@@ -26,7 +26,7 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
     private static final String SPE = "\n";
     private static final String DEFAULT_ENCODE = "ISO-8859-1";
     private String encode = "GBK";
-    private RandomAccessFile raf;
+    RandomAccessFile raf;
     private int change = 0;
    
 
@@ -59,23 +59,22 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
             String tempStr = "";
             String[] levelArray = level.split(",");
             int start = lineBegin - 10;
-            int end = lineEnd + 10;
             if (start < 1) {
                 start = 1;
             }
-            int i = 1;
+            int l = 1;
             
             //对日志文件进行按行读取，因为要显示关键字前10和后10行数据，所以要多读20条数据
             while (raf.getFilePointer() < raf.length()) {
                 change = 0;
-                if (i > end) {
+                if (l > lineEnd) {
                     break;
                 }
-                if (i >= start && i < lineBegin) {
+                if (l >= start && l < lineBegin) {
                     tempStr = readContentByLine(raf);
                     tempList = updateTempList(tempList,tempStr);
                 }
-                else if (i >= lineBegin && i <= lineEnd) {
+                else if (l >= lineBegin && l <= lineEnd) {
                     tempStr = readContentByLine(raf);
                     tempList = updateTempList(tempList,tempStr);
                     //关键字不为空
@@ -84,17 +83,16 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
                         for (int y = 0; y < levelArray.length; y++) {
                             //关键字不为空，level存在
                             if(isLevelNeed(tempStr, levelArray[y])) {
-                                int isNull = -1;
-                                
+                                //关键字不为空，level存在，keyword存在
                                 if(isKeyWordNeed(tempStr,keyWord)){
-                                    content = makeContent(content,tempList,tempStr,ttempList,isNull);
+                                    content = makeContent(content,tempList,tempStr,ttempList,l,lineEnd);
                                 }
                             }
                             //关键字不为空，level不存在
                             else {
                                 if(isKeyWordNeed(tempStr,keyWord)){
-                                    int isNull = -1;
-                                    content = makeContent(content,tempList,tempStr,ttempList,isNull);
+                                   
+                                    content = makeContent(content,tempList,tempStr,ttempList,l,lineEnd);
                                 }
                             }
                         }
@@ -115,18 +113,10 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
 
                     }
                 }
-                else if (i > lineEnd && i <= end) {
-                    tempStr = readContentByLine(raf);
-                    tempList = updateTempList(tempList,tempStr);
-                }
-                else {
-                    tempStr = readContentByLine(raf);
-                }
                 if(change != 0){
-                   System.out.println(111);
-                   i += change; 
+                   l += change + 1; 
                 }else{
-                   i++;  
+                   l++;  
                 }
                 raf.seek(raf.getFilePointer());
             }
@@ -143,6 +133,9 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
     }
     //解决raf的乱码问题，raf默认用ISO-8859-1读取，我们要将他改为用用户选择的编码格式我们默认用gbk
     private String readContentByLine(RandomAccessFile raf) throws IOException{
+        if(raf.getFilePointer() >= raf.length()){
+            return "";
+        }
         return new String(raf.readLine().getBytes(DEFAULT_ENCODE),encode);
     }
     
@@ -179,29 +172,21 @@ public class Mlf4jLogFileServiceImpl implements IMlf4jLogFileService {
         return content;
     }
     
-    private String makeContent(String content,List<String> tempList,String tempStr,List<String> ttempList,int isNull) throws IOException{
+    private String makeContent(String content,List<String> tempList,String tempStr,List<String> ttempList,int l,int lineEnd) throws IOException{
         content = makeTempListToContent(content,tempList);
+        tempList.clear();
         for (int j = 0; j < 10; j++) {
-            tempStr = readContentByLine(raf);
-            ++change;
-            System.out.println(change);
-            if (tempList.size() >= 10) {
-                tempList.remove(0);
-            }
-            if (MvcUtils.StringUtil.isBlank(tempStr)) {
-                if(j != 0 ){
-                    for(int i = 0;i < tempList.size();i++){
-                        ttempList.add(tempList.get(i));
-                    }
-                    tempList = ttempList;  
-                    ttempList.clear();
-                }
-                isNull = j;
+            if(l + change >= lineEnd){
                 break;
             }
+            tempStr = readContentByLine(raf);
+            change++;
             tempList.add(tempStr  + SPE);
+            if(change == 0){
+                l++; 
+            }
         }
-        if(isNull != 0){
+        if(tempList.size() > 0){
             content = makeTempListToContent(content,tempList);
         }
         tempList.clear();
