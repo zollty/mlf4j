@@ -96,6 +96,19 @@ public class Mlf4jLogFileServiceImplTest {
                 keyWord);
     }
     
+    @Test
+    public void testcode(){
+        String lineBegin = "1";
+        String code = "UTF-8";
+        String lineEnd = "50";
+        String levelStr = "";
+        String keyWord = "";
+        testGetFileContent("testcode.txt", "testcode.txt", lineBegin,
+                code,
+                lineEnd,
+                levelStr,
+                keyWord);
+    }
     
     private void testGetFileContent(String dataFileName, String resultFileName, String lineBegin,
     String code,
