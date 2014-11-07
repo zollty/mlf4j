@@ -6,7 +6,7 @@
 <link href="../css/main.css" rel="stylesheet"  type="text/css" />
 <script type="text/javascript" src="../js/jquery.js"></script>
 <script type="text/javascript" src="../js/json2.js"></script>
-<script type="text/javascript" src="../js/WebPathUtils.js"></script>
+<script type="text/javascript" src="../js/zollty-utils.js"></script>
 <script type="text/javascript" src="../js/waitingbox.js"></script>
 <style type="text/css">
 .maindiv {
@@ -55,7 +55,7 @@
 <script type="text/javascript">
 function getFile(){
 	var levelStr = "";
-	var url = WebPathUtils.getRootPath() + "mlf4j/showLogFileContent";
+	var url = zt.getBaseURL() + "mlf4j/showLogFileContent";
 	var logFilePath = $("#logFilePath").val();
 	var lineBegin = $("#lineBegin").val();
 	var lineEnd = $("#lineEnd").val();
@@ -85,7 +85,7 @@ function getFile(){
 		}
 	}
 	
-	showWBox(); // 弹出提示： 正在处理，请稍后....
+	waitingbox.show(); // 弹出提示： 正在处理，请稍后....
 	$.post(url, {
 		"logFilePath": logFilePath,
 		"lineBegin":lineBegin,
@@ -94,7 +94,7 @@ function getFile(){
 		"levelStr":levelStr,
 		"code":code
 	}, function(data) {
-		hideWBox(); // 关闭提示
+		waitingbox.hide(); // 关闭提示
 		if("error" == data){
 			alert("找不到指定文件，文件路径有误！");
 			return;
