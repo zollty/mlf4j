@@ -43,11 +43,53 @@ public class Mlf4jLogFileServiceImplTest {
     @Test
     public void testGetFileContent02(){
         String lineBegin = "1";
-        String code = "";
+        String code = "UTF-8";
         String lineEnd = "8";
         String levelStr = "ERROR";
         String keyWord = "";
         testGetFileContent("testcase02.txt", "testcase02-result.txt", lineBegin,
+                code,
+                lineEnd,
+                levelStr,
+                keyWord);
+    }
+    
+    @Test
+    public void testGetFileContent03(){
+        String lineBegin = "1";
+        String code = "UTF-8";
+        String lineEnd = "47";
+        String levelStr = "";
+        String keyWord = "价格";
+        testGetFileContent("testcase03.txt", "testcase03-result.txt", lineBegin,
+                code,
+                lineEnd,
+                levelStr,
+                keyWord);
+    }
+    
+    @Test
+    public void testGetFileContent04(){
+        String lineBegin = "1";
+        String code = "UTF-8";
+        String lineEnd = "47";
+        String levelStr = "ERR";
+        String keyWord = "价格";
+        testGetFileContent("testcase04.txt", "testcase04-result.txt", lineBegin,
+                code,
+                lineEnd,
+                levelStr,
+                keyWord);
+    }
+    
+    @Test
+    public void testGetFileContent05(){
+        String lineBegin = "1";
+        String code = "UTF-8";
+        String lineEnd = "47";
+        String levelStr = "ERROR";
+        String keyWord = "价格";
+        testGetFileContent("testcase05.txt", "testcase05-result.txt", lineBegin,
                 code,
                 lineEnd,
                 levelStr,
@@ -62,13 +104,16 @@ public class Mlf4jLogFileServiceImplTest {
     String keyWord){
         
         IMlf4jLogFileService mlf4jLogFileService = new Mlf4jLogFileServiceImpl();
-        
+        String encode = "GBK";
+        if(MvcUtils.StringUtil.isNotBlank(code)){
+            encode = code;
+        }
         String filePath = null;
         
         String expectedContent = null;
         try {
             filePath = getFilePathFromClassPath(Mlf4jLogFileServiceImplTest.class.getClassLoader(), "com/travelsky/mlf4j/monitor/service/mlf4j/impl/"+dataFileName);
-            expectedContent = makeTempListToContent( getTextFileContent(MvcUtils.ResourceUtil.getInputStreamFromClassPath(Mlf4jLogFileServiceImplTest.class.getClassLoader(), "com/travelsky/mlf4j/monitor/service/mlf4j/impl/"+resultFileName), "GBK") );
+            expectedContent = makeTempListToContent( getTextFileContent(MvcUtils.ResourceUtil.getInputStreamFromClassPath(Mlf4jLogFileServiceImplTest.class.getClassLoader(), "com/travelsky/mlf4j/monitor/service/mlf4j/impl/"+resultFileName), encode) );
         }
         catch (NestedCheckedException e) {
             e.printStackTrace();
@@ -102,7 +147,6 @@ public class Mlf4jLogFileServiceImplTest {
         try {
             String queryResult = 
             mlf4jLogFileService.getFileContent(queryCondition);
-            
             Assert.assertEquals(expectedContent, queryResult);
         }
         catch (MlfI18nException e) {
