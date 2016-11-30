@@ -6,7 +6,7 @@
 <link href="../css/main.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="../js/jquery.js"></script>
 <script type="text/javascript" src="../js/json2.js"></script>
-<script type="text/javascript" src="../js/zollty-utils.js"></script>
+<script type="text/javascript" src="../js/WebPathUtils.js"></script>
 <script type="text/javascript" src="../js/waitingbox.js"></script>
 <style type="text/css">
 .wpdiv {
@@ -23,7 +23,7 @@
 
 <div>
   <div style="font-size: 16px; font-weight: bold;">Mlf4j配置如下：</div>
-  <textarea id="config_file_content" rows="20" cols="180"></textarea>
+  <textarea id="config_file_content" rows="25" cols="180"></textarea>
   <br />
   <div class="wpdiv" style="width:200px;"></div><input id="modify_config_btn" type="button" value="修改配置" size="24" />
 </div>
@@ -34,10 +34,10 @@
 $(function() {
 	  // 查询日志配置的详细内容
 	  var uri = "mlf4j/show-config-file";
-	  var url = zt.getBaseURL() + uri;
-	  waitingbox.show(); // 弹出提示： 正在处理，请稍后....
+	  var url = WebPathUtils.getRootPath() + uri;
+	  showWBox(); // 弹出提示： 正在处理，请稍后....
 	  $.get(url, function(data) {
-		  waitingbox.hide(); // 关闭提示
+	  	hideWBox(); // 关闭提示
 	  	$("#config_file_content").val(data);
 	  });
 });
@@ -49,12 +49,12 @@ $(function() {
 			return;
 		}
 		var uri = "mlf4j/refresh-config";
-		var url = zt.getBaseURL() + uri;
-		waitingbox.show(); // 弹出提示： 正在处理，请稍后....
+		var url = WebPathUtils.getRootPath() + uri;
+		showWBox(); // 弹出提示： 正在处理，请稍后....
 		$.post(url, {
 			"configStr" : $("#config_file_content").val()
 		}, function(data) {
-			waitingbox.hide(); // 关闭提示
+			hideWBox(); // 关闭提示
 			if (data == 'OK') {
 				alert("修改成功");
 			} else {

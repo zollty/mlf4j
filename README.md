@@ -15,7 +15,7 @@ How to use it
 ```java
   public static final Logger LOG = LogFactory.getLogger(); // Concise
 
-  LOG.error("Hello {}, welcome to {}", "GUYS", "ZolltyLog Demo"); // use placeholder
+  LOG.error("Hello {}, welcome to {}", "GUYS", "Log Demo"); // use placeholder
 ```
 ### Some advanced usages 
 	See the manual and docs.  
